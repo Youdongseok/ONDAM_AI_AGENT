@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { GarimReferenceOrb } from './GamgikBlobOrb.jsx';
+import RadarTripleDotLoader from './RadarTripleDotLoader.jsx';
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -143,6 +144,7 @@ export default function GarimAgentOrbWithFace({
   motion = 0.78,
   statusKey = 'normal',
   themeMode = 'light',
+  isLoading = false,
   className = '',
   expressionOverride = null,
 }) {
@@ -329,6 +331,12 @@ export default function GarimAgentOrbWithFace({
 
         <AgentFace look={look} expression={visibleExpression} />
 
+        {isLoading ? (
+          <div className="garim-radar-loader-position">
+            <RadarTripleDotLoader themeMode={themeMode} />
+          </div>
+        ) : null}
+
         <div className={`garim-surprise-marks is-${visibleExpression}`} aria-hidden="true">
           <i className="garim-surprise-mark garim-surprise-mark-left" />
           <i className="garim-surprise-mark garim-surprise-mark-middle" />
@@ -373,6 +381,17 @@ export default function GarimAgentOrbWithFace({
 
         .garim-agent-motion.is-click-moving {
           animation: garimAgentClickMove 520ms cubic-bezier(0.2, 0.9, 0.22, 1);
+        }
+
+        .garim-radar-loader-position {
+          position: absolute;
+          left: 50%;
+          top: 67%;
+          z-index: 7;
+          width: 138px;
+          height: 72px;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
         }
 
         .garim-agent-orb-wrap.garim-agent-orb-modal-visual {

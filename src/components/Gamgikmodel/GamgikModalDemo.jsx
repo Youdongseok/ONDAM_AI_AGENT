@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import GamgikAgentOrbWithFace from './GamgikAgentOrbWithFace.jsx';
+import GlassPagination from './GlassPagination.jsx';
 
 export default function GamgikModalDemo({ themeMode = 'light' }) {
   const expressionStartTimerRef = useRef(null);
   const expressionReactionTimerRef = useRef(null);
   const expressionTimerRef = useRef(null);
   const [expressionOverride, setExpressionOverride] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     return () => {
@@ -68,6 +71,7 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
           motion={0.78}
           statusKey="normal"
           themeMode={themeMode}
+          isLoading={isLoading}
           expressionOverride={expressionOverride}
         />
       </div>
@@ -108,6 +112,24 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
         >
           검색중
         </button>
+
+        <button
+          type="button"
+          aria-pressed={isLoading}
+          onClick={() => setIsLoading(current => !current)}
+          className={expressionButtonClassName}
+        >
+          {isLoading ? '로딩 종료' : '로딩'}
+        </button>
+      </div>
+
+      <div className="w-full max-w-[520px]">
+        <GlassPagination
+          currentPage={currentPage}
+          totalPages={12}
+          onPageChange={setCurrentPage}
+          themeMode={themeMode}
+        />
       </div>
     </section>
   );
