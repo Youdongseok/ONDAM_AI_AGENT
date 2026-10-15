@@ -5,7 +5,16 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const ORB_THEMES = {
-  normal: {
+  light: {
+    bodyTop: '#60A5FA',
+    bodyMid: '#2563EB',
+    bodyBottom: '#1E3A8A',
+    rimWhite: '#F0F9FF',
+    rimPurple: '#93C5FD',
+    bottomBlue: '#38BDF8',
+    outerGlow: '#60A5FA',
+  },
+  dark: {
     bodyTop: '#343CA8',
     bodyMid: '#20246D',
     bodyBottom: '#080B24',
@@ -14,6 +23,9 @@ const ORB_THEMES = {
     bottomBlue: '#4E6BFF',
     outerGlow: '#8B6CFF',
   },
+};
+
+const STATUS_THEMES = {
   allow: {
     bodyTop: '#0891B2',
     bodyMid: '#155E75',
@@ -43,11 +55,12 @@ const ORB_THEMES = {
   },
 };
 
-function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal' }) {
+function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal', themeMode = 'light' }) {
   const materialRef = useRef(null);
   const groupRef = useRef(null);
   const { size } = useThree();
-  const theme = ORB_THEMES[statusKey] ?? ORB_THEMES.normal;
+  const modeTheme = ORB_THEMES[themeMode] ?? ORB_THEMES.light;
+  const theme = statusKey === 'normal' ? modeTheme : (STATUS_THEMES[statusKey] ?? modeTheme);
 
   const uniforms = useMemo(
     () => ({
@@ -199,20 +212,28 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal' }) {
       vec3 body = mix(uBodyBottom, uBodyTop, vertical * 0.92);
       body = mix(body, uBodyMid, 0.34);
 
-      // 중앙 어둠을 너무 강하지 않게 낮춤
+      // 중앙의 응축된 색과 바깥 셸 색을 분리해 두 영역이 분명하게 읽히도록 함
+      float radial = clamp(length(p) / baseR, 0.0, 1.0);
+      float coreMask = 1.0 - smoothstep(0.24, 0.66, radial);
+      float shellMask = smoothstep(0.48, 0.92, radial);
+      vec3 coreColor = mix(uBodyMid, uBodyBottom, 0.34);
+      body = mix(body, coreColor, coreMask * 0.52);
+      body = mix(body, uBodyTop, shellMask * 0.2);
+
+      // 밝은 배경에서도 중심의 푸른 색감이 탁해지지 않도록 그림자를 블루 톤으로 유지
       float centerShade = smoothstep(0.78, 0.08, length(p));
-      body -= vec3(0.014, 0.012, 0.026) * centerShade;
+      body -= vec3(0.012, 0.022, 0.048) * centerShade;
 
       // 구면 입체감
       body += uBodyTop * diffuseTop * 0.11;
-      body += vec3(0.018, 0.020, 0.052) * z * 0.34;
+      body += vec3(0.030, 0.052, 0.090) * z * 0.28;
 
       // 내부 미세 생동감
       float innerPulse = 0.5 + 0.5 * sin(t * 0.65 + p.y * 3.0);
-      vec3 innerShift = vec3(0.018, 0.018, 0.052) * innerPulse * 0.16;
+      vec3 innerShift = vec3(0.018, 0.048, 0.090) * innerPulse * 0.18;
 
-      // 보라색 외곽 림
-      float purpleRim = fresnel * 0.56 + rim * 0.18;
+      // 흰 배경에서 실루엣을 잡아 주는 스카이블루 외곽 림
+      float purpleRim = fresnel * 0.66 + rim * 0.24;
       purpleRim *= smoothstep(-0.64, 0.9, p.y);
 
       // 아래 블루 림
@@ -231,7 +252,7 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal' }) {
       centerGlowUv.x *= 0.92;
       centerGlowUv.y *= 1.12;
 
-      float centerGlow = 1.0 - smoothstep(0.0, 0.40, length(centerGlowUv));
+      float centerGlow = 1.0 - smoothstep(0.0, 0.32, length(centerGlowUv));
       centerGlow *= inside;
 
       float centerDepth = smoothstep(0.72, 0.05, length(p));
@@ -241,7 +262,7 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal' }) {
       centerGlow *= centerPulse;
 
       // 기존보다 살짝 더 보이게
-      centerGlow *= 0.24;
+      centerGlow *= 0.2;
 
       vec3 color = body + innerShift;
 
@@ -252,11 +273,11 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal' }) {
       vec3 centerGlowColor = mix(uRimPurple, uRimWhite, 0.56);
       color += centerGlowColor * centerGlow * 1.12;
 
-      // 바깥 퍼플 헤이즈
-      color += uOuterGlow * outerGlow * 0.18;
+      // 흰 배경에서는 바깥 헤이즈를 얇게 유지해 가장자리가 흐려지지 않게 함
+      color += uOuterGlow * outerGlow * 0.11;
 
       float alpha = inside;
-      alpha = max(alpha, outerGlow * 0.24);
+      alpha = max(alpha, outerGlow * 0.16);
       alpha = clamp(alpha, 0.0, 1.0);
 
       gl_FragColor = vec4(color, alpha);
@@ -288,15 +309,24 @@ export function GarimReferenceOrb({
   speed = 0.95,
   motion = 0.78,
   statusKey = 'normal',
+  themeMode = 'light',
 }) {
+  const isDark = themeMode === 'dark';
+  const floatDuration = `${(Math.PI * 2) / (0.55 * Math.max(speed, 0.01))}s`;
+
   return (
     <div
-      className={`garim-reference-orb ${className}`}
+      className={`garim-reference-orb is-${themeMode} ${className}`}
       style={{
         width: typeof size === 'number' ? `${size}px` : size,
         height: typeof size === 'number' ? `${size}px` : size,
         background,
         '--orb-speed': speed,
+        '--orb-float-duration': floatDuration,
+        '--floor-glow-far': isDark ? 0.59 : 0.63,
+        '--floor-glow-near': isDark ? 0.62 : 0.66,
+        '--reflection-far': isDark ? 0.44 : 0.62,
+        '--reflection-near': isDark ? 0.47 : 0.65,
       }}
     >
       <Canvas
@@ -309,9 +339,10 @@ export function GarimReferenceOrb({
         }}
         dpr={[1, 2]}
       >
-        <OrbPlane speed={speed} motion={motion} statusKey={statusKey} />
+        <OrbPlane speed={speed} motion={motion} statusKey={statusKey} themeMode={themeMode} />
       </Canvas>
 
+      <div className="garim-orb-reflection" />
       <div className="garim-orb-bottom-glow" />
 
       <style>{`
@@ -329,34 +360,112 @@ export function GarimReferenceOrb({
           z-index: 2;
         }
 
+        .garim-orb-reflection {
+          position: absolute;
+          left: 50%;
+          bottom: 4.5%;
+          width: 27%;
+          height: 13%;
+          transform: translateX(-50%) scaleY(0.72);
+          transform-origin: 50% 0%;
+          border-radius: 50%;
+          background:
+            radial-gradient(
+              ellipse at 50% 0%,
+              rgba(239, 246, 255, 0.64) 0%,
+              rgba(147, 197, 253, 0.42) 18%,
+              rgba(59, 130, 246, 0.28) 42%,
+              rgba(37, 99, 235, 0.12) 62%,
+              rgba(37, 99, 235, 0) 80%
+            );
+          filter: blur(7px);
+          opacity: 0.72;
+          mask-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.7) 38%, transparent 100%);
+          -webkit-mask-image: linear-gradient(
+            to bottom,
+            black 0%,
+            rgba(0, 0, 0, 0.7) 38%,
+            transparent 100%
+          );
+          z-index: 1;
+          animation: garimOrbReflection var(--orb-float-duration) linear infinite;
+        }
+
+        .garim-reference-orb.is-dark .garim-orb-reflection {
+          background:
+            radial-gradient(
+              ellipse at 50% 0%,
+              rgba(246, 240, 255, 0.44) 0%,
+              rgba(165, 139, 255, 0.34) 22%,
+              rgba(78, 107, 255, 0.2) 48%,
+              rgba(78, 107, 255, 0) 80%
+            );
+        }
+
         .garim-orb-bottom-glow {
           position: absolute;
           left: 50%;
-          bottom: 14.5%;
-          width: 30%;
-          height: 6%;
+          bottom: 13.5%;
+          width: 34%;
+          height: 7%;
           transform: translateX(-50%);
           border-radius: 999px;
           background: radial-gradient(
             ellipse,
+            rgba(30, 58, 138, 0.42) 0%,
+            rgba(59, 130, 246, 0.22) 38%,
+            rgba(96, 165, 250, 0.08) 62%,
+            rgba(96, 165, 250, 0) 78%
+          );
+          filter: blur(13px);
+          z-index: 1;
+          animation: garimOrbFloorGlow var(--orb-float-duration) linear infinite;
+        }
+
+        .garim-reference-orb.is-dark .garim-orb-bottom-glow {
+          bottom: 14.5%;
+          width: 30%;
+          height: 6%;
+          background: radial-gradient(
+            ellipse,
             rgba(78, 107, 255, 0.56) 0%,
             rgba(139, 108, 255, 0.22) 42%,
-            rgba(78, 107, 255, 0.0) 76%
+            rgba(78, 107, 255, 0) 76%
           );
           filter: blur(17px);
-          z-index: 1;
-          animation: garimOrbFloorGlow calc(6.6s / var(--orb-speed)) ease-in-out infinite;
         }
 
         @keyframes garimOrbFloorGlow {
-          0%, 100% {
-            opacity: 0.44;
-            transform: translateX(-50%) scaleX(0.92);
+          0%, 50%, 100% {
+            opacity: var(--floor-glow-near);
+            transform: translateX(-50%) scaleX(1);
           }
 
-          50% {
-            opacity: 0.82;
+          25% {
+            opacity: var(--floor-glow-far);
+            transform: translateX(-50%) scaleX(0.88);
+          }
+
+          75% {
+            opacity: var(--floor-glow-near);
             transform: translateX(-50%) scaleX(1.08);
+          }
+        }
+
+        @keyframes garimOrbReflection {
+          0%, 50%, 100% {
+            transform: translateX(-50%) scaleX(1) scaleY(0.72);
+            opacity: var(--reflection-near);
+          }
+
+          25% {
+            transform: translateX(-50%) scaleX(0.9) scaleY(0.66);
+            opacity: var(--reflection-far);
+          }
+
+          75% {
+            transform: translateX(-50%) scaleX(1.06) scaleY(0.76);
+            opacity: var(--reflection-near);
           }
         }
       `}</style>
@@ -372,8 +481,7 @@ export default function GarimReferenceOrbPreview() {
         margin: 0,
         display: 'grid',
         placeItems: 'center',
-        background:
-          'radial-gradient(circle at 50% 48%, rgba(88, 64, 190, 0.22), rgba(9, 7, 24, 0.92) 44%, #03040a 100%)',
+        background: 'radial-gradient(circle at 50% 48%, #EFF6FF 0%, #FFFFFF 58%, #F8FAFC 100%)',
       }}
     >
       <GarimReferenceOrb size={460} speed={0.95} motion={0.78} />

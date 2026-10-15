@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import GamgikAgentOrbWithFace from './GamgikAgentOrbWithFace.jsx';
 
-export default function GamgikModalDemo() {
+export default function GamgikModalDemo({ themeMode = 'light' }) {
   const expressionStartTimerRef = useRef(null);
   const expressionReactionTimerRef = useRef(null);
   const expressionTimerRef = useRef(null);
@@ -53,6 +53,12 @@ export default function GamgikModalDemo() {
     }, 1760);
   }
 
+  const expressionButtonClassName = `rounded-md border px-5 py-2.5 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-400/50 ${
+    themeMode === 'dark'
+      ? 'border-white/15 bg-white/8 text-blue-50 hover:border-white/30 hover:bg-white/14'
+      : 'border-blue-100 bg-blue-50/80 text-blue-700 hover:border-blue-200 hover:bg-blue-100'
+  }`;
+
   return (
     <section className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center gap-8 overflow-hidden">
       <div className="relative h-[460px] w-[460px] shrink-0 overflow-visible">
@@ -61,6 +67,7 @@ export default function GamgikModalDemo() {
           speed={10}
           motion={0.78}
           statusKey="normal"
+          themeMode={themeMode}
           expressionOverride={expressionOverride}
         />
       </div>
@@ -69,7 +76,7 @@ export default function GamgikModalDemo() {
         <button
           type="button"
           onClick={() => showExpression('happy')}
-          className="rounded-md border border-cyan-200/30 bg-cyan-200/12 px-5 py-2.5 text-sm font-semibold text-cyan-50 shadow-[0_0_24px_rgba(103,232,249,0.14)] transition hover:border-cyan-100/55 hover:bg-cyan-200/20 focus:outline-none focus:ring-2 focus:ring-cyan-200/55"
+          className={expressionButtonClassName}
         >
           ^^ 웃는 표정
         </button>
@@ -77,7 +84,7 @@ export default function GamgikModalDemo() {
         <button
           type="button"
           onClick={() => showExpression('angry')}
-          className="rounded-md border border-rose-200/30 bg-rose-300/12 px-5 py-2.5 text-sm font-semibold text-rose-50 shadow-[0_0_24px_rgba(251,113,133,0.14)] transition hover:border-rose-100/55 hover:bg-rose-300/20 focus:outline-none focus:ring-2 focus:ring-rose-200/55"
+          className={expressionButtonClassName}
         >
           \ / 화난 표정
         </button>
@@ -85,23 +92,19 @@ export default function GamgikModalDemo() {
         <button
           type="button"
           onClick={() => showExpression('crying')}
-          className="rounded-md border border-sky-200/30 bg-sky-300/12 px-5 py-2.5 text-sm font-semibold text-sky-50 shadow-[0_0_24px_rgba(125,211,252,0.14)] transition hover:border-sky-100/55 hover:bg-sky-300/20 focus:outline-none focus:ring-2 focus:ring-sky-200/55"
+          className={expressionButtonClassName}
         >
           ㅠ ㅠ 우는 표정
         </button>
 
-        <button
-          type="button"
-          onClick={showSleepyExpression}
-          className="rounded-md border border-violet-200/30 bg-violet-300/12 px-5 py-2.5 text-sm font-semibold text-violet-50 shadow-[0_0_24px_rgba(196,181,253,0.14)] transition hover:border-violet-100/55 hover:bg-violet-300/20 focus:outline-none focus:ring-2 focus:ring-violet-200/55"
-        >
+        <button type="button" onClick={showSleepyExpression} className={expressionButtonClassName}>
           졸린 표정
         </button>
 
         <button
           type="button"
           onClick={() => showExpression('searching', 1800)}
-          className="rounded-md border border-indigo-200/30 bg-indigo-300/12 px-5 py-2.5 text-sm font-semibold text-indigo-50 shadow-[0_0_24px_rgba(165,180,252,0.14)] transition hover:border-indigo-100/55 hover:bg-indigo-300/20 focus:outline-none focus:ring-2 focus:ring-indigo-200/55"
+          className={expressionButtonClassName}
         >
           검색중
         </button>

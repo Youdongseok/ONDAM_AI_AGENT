@@ -142,6 +142,7 @@ export default function GarimAgentOrbWithFace({
   speed = 0.95,
   motion = 0.78,
   statusKey = 'normal',
+  themeMode = 'light',
   className = '',
   expressionOverride = null,
 }) {
@@ -304,7 +305,7 @@ export default function GarimAgentOrbWithFace({
   return (
     <div
       ref={wrapRef}
-      className={`garim-agent-orb-wrap ${className}`}
+      className={`garim-agent-orb-wrap is-${themeMode} ${className}`}
       style={{
         width: typeof size === 'number' ? `${size}px` : size,
         height: typeof size === 'number' ? `${size}px` : size,
@@ -316,7 +317,13 @@ export default function GarimAgentOrbWithFace({
           isClickMoving || visibleExpression === 'surprised' ? 'is-click-moving' : ''
         }`}
       >
-        <GarimReferenceOrb size={size} speed={speed} motion={motion} statusKey={statusKey} />
+        <GarimReferenceOrb
+          size={size}
+          speed={speed}
+          motion={motion}
+          statusKey={statusKey}
+          themeMode={themeMode}
+        />
 
         <SearchDecorations expression={visibleExpression} />
 
@@ -490,11 +497,11 @@ export default function GarimAgentOrbWithFace({
           background:
             radial-gradient(
               ellipse at 48% 50%,
-              rgba(190, 235, 255, 0.46) 0%,
-              rgba(88, 190, 255, 0.28) 30%,
-              rgba(120, 92, 255, 0.24) 54%,
-              rgba(139, 92, 246, 0.08) 76%,
-              rgba(139, 92, 246, 0) 100%
+              rgba(224, 242, 254, 0.5) 0%,
+              rgba(125, 211, 252, 0.3) 30%,
+              rgba(96, 165, 250, 0.2) 54%,
+              rgba(59, 130, 246, 0.07) 76%,
+              rgba(59, 130, 246, 0) 100%
             );
           filter: blur(13px);
           opacity: 0.68;
@@ -512,6 +519,18 @@ export default function GarimAgentOrbWithFace({
           opacity: 0.24;
           mix-blend-mode: screen;
           mask-image: radial-gradient(ellipse at center, black 0%, black 54%, transparent 78%);
+        }
+
+        .garim-agent-orb-wrap.is-dark .garim-face-glow {
+          background:
+            radial-gradient(
+              ellipse at 48% 50%,
+              rgba(190, 235, 255, 0.46) 0%,
+              rgba(88, 190, 255, 0.28) 30%,
+              rgba(120, 92, 255, 0.24) 54%,
+              rgba(139, 92, 246, 0.08) 76%,
+              rgba(139, 92, 246, 0) 100%
+            );
         }
 
         .garim-eye-layer {
@@ -534,7 +553,7 @@ export default function GarimAgentOrbWithFace({
           filter:
             drop-shadow(0 0 3px rgba(255, 255, 255, 0.92))
             drop-shadow(0 0 8px rgba(190, 235, 255, 0.62))
-            drop-shadow(0 0 16px rgba(139, 92, 246, 0.42));
+            drop-shadow(0 0 16px rgba(56, 189, 248, 0.36));
           transition:
             transform 90ms ease,
             opacity 110ms ease,
@@ -542,6 +561,13 @@ export default function GarimAgentOrbWithFace({
             width 90ms ease,
             left 90ms ease,
             right 90ms ease;
+        }
+
+        .garim-agent-orb-wrap.is-dark .garim-eye {
+          filter:
+            drop-shadow(0 0 3px rgba(255, 255, 255, 0.92))
+            drop-shadow(0 0 8px rgba(190, 235, 255, 0.62))
+            drop-shadow(0 0 16px rgba(139, 92, 246, 0.42));
         }
 
         /*
