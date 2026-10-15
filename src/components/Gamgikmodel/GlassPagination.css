@@ -1,10 +1,10 @@
 .da-pagination {
-  --da-pagination-accent: #2563eb;
-  --da-pagination-accent-soft: rgba(96, 165, 250, 0.14);
+  --da-pagination-accent: #075df6;
+  --da-pagination-accent-soft: rgba(54, 233, 255, 0.14);
   --da-pagination-text: #475569;
   --da-pagination-line: #cbd5e1;
   --da-pagination-disabled: #94a3b8;
-  --da-pagination-shadow: rgba(37, 99, 235, 0.24);
+  --da-pagination-shadow: rgba(7, 93, 246, 0.26);
   --da-pagination-size: 40px;
   --da-pagination-gap: 12px;
   width: 100%;

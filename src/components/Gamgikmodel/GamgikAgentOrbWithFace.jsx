@@ -516,11 +516,11 @@ export default function GarimAgentOrbWithFace({
           background:
             radial-gradient(
               ellipse at 48% 50%,
-              rgba(224, 242, 254, 0.5) 0%,
-              rgba(125, 211, 252, 0.3) 30%,
-              rgba(96, 165, 250, 0.2) 54%,
-              rgba(59, 130, 246, 0.07) 76%,
-              rgba(59, 130, 246, 0) 100%
+              rgba(233, 253, 255, 0.54) 0%,
+              rgba(54, 233, 255, 0.3) 30%,
+              rgba(22, 139, 255, 0.22) 54%,
+              rgba(7, 93, 246, 0.08) 76%,
+              rgba(7, 93, 246, 0) 100%
             );
           filter: blur(13px);
           opacity: 0.68;
@@ -571,8 +571,8 @@ export default function GarimAgentOrbWithFace({
           display: block;
           filter:
             drop-shadow(0 0 3px rgba(255, 255, 255, 0.92))
-            drop-shadow(0 0 8px rgba(190, 235, 255, 0.62))
-            drop-shadow(0 0 16px rgba(56, 189, 248, 0.36));
+            drop-shadow(0 0 8px rgba(54, 233, 255, 0.66))
+            drop-shadow(0 0 16px rgba(0, 229, 255, 0.42));
           transition:
             transform 90ms ease,
             opacity 110ms ease,

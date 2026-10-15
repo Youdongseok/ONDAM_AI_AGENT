@@ -63,7 +63,13 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
   }`;
 
   return (
-    <section className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center gap-8 overflow-hidden">
+    <section className="flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center gap-6 overflow-hidden">
+      <img
+        src="/logo.png"
+        alt="ONDAM"
+        className="h-auto w-[280px] max-w-[72vw] object-contain sm:w-[320px]"
+      />
+
       <div className="relative h-[460px] w-[460px] shrink-0 overflow-visible">
         <GamgikAgentOrbWithFace
           size={460}

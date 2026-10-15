@@ -6,13 +6,13 @@ import * as THREE from 'three';
 
 const ORB_THEMES = {
   light: {
-    bodyTop: '#60A5FA',
-    bodyMid: '#2563EB',
-    bodyBottom: '#1E3A8A',
-    rimWhite: '#F0F9FF',
-    rimPurple: '#93C5FD',
-    bottomBlue: '#38BDF8',
-    outerGlow: '#60A5FA',
+    bodyTop: '#168BFF',
+    bodyMid: '#075DF6',
+    bodyBottom: '#063CC8',
+    rimWhite: '#E9FDFF',
+    rimPurple: '#36E9FF',
+    bottomBlue: '#00E5FF',
+    outerGlow: '#15DFFF',
   },
   dark: {
     bodyTop: '#343CA8',
@@ -67,6 +67,7 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal', themeMode
       uTime: { value: 0 },
       uAspect: { value: 1 },
       uMotion: { value: motion },
+      uLightMode: { value: themeMode === 'light' ? 1 : 0 },
 
       uBodyTop: { value: new THREE.Color(theme.bodyTop) },
       uBodyMid: { value: new THREE.Color(theme.bodyMid) },
@@ -77,7 +78,7 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal', themeMode
       uBottomBlue: { value: new THREE.Color(theme.bottomBlue) },
       uOuterGlow: { value: new THREE.Color(theme.outerGlow) },
     }),
-    [motion, theme]
+    [motion, theme, themeMode]
   );
 
   useFrame(state => {
@@ -88,6 +89,7 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal', themeMode
       materialRef.current.uniforms.uTime.value = t;
       materialRef.current.uniforms.uAspect.value = size.width / size.height;
       materialRef.current.uniforms.uMotion.value = motion;
+      materialRef.current.uniforms.uLightMode.value = themeMode === 'light' ? 1 : 0;
       materialRef.current.uniforms.uBodyTop.value.set(theme.bodyTop);
       materialRef.current.uniforms.uBodyMid.value.set(theme.bodyMid);
       materialRef.current.uniforms.uBodyBottom.value.set(theme.bodyBottom);
@@ -120,6 +122,7 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal', themeMode
     uniform float uTime;
     uniform float uAspect;
     uniform float uMotion;
+    uniform float uLightMode;
 
     uniform vec3 uBodyTop;
     uniform vec3 uBodyMid;
@@ -266,15 +269,20 @@ function OrbPlane({ speed = 0.95, motion = 0.78, statusKey = 'normal', themeMode
 
       vec3 color = body + innerShift;
 
+      // 참고 이미지처럼 위쪽 가장자리에 유리광이 맺히는 광택 추가
+      float glassHighlight = pow(diffuseTop, 4.5) * (0.24 + fresnel * 0.76);
+      vec3 glassColor = mix(uRimPurple, uRimWhite, 0.78);
+      color += glassColor * glassHighlight * (0.14 + uLightMode * 0.38);
+
       // 전체적으로 색감이 더 또렷하게 보이도록 강도 상승
       color += uRimPurple * purpleRim * 0.64;
-      color += uBottomBlue * bottomGlow * 1.08;
+      color += uBottomBlue * bottomGlow * (1.08 + uLightMode * 0.34);
 
       vec3 centerGlowColor = mix(uRimPurple, uRimWhite, 0.56);
       color += centerGlowColor * centerGlow * 1.12;
 
       // 흰 배경에서는 바깥 헤이즈를 얇게 유지해 가장자리가 흐려지지 않게 함
-      color += uOuterGlow * outerGlow * 0.11;
+      color += uOuterGlow * outerGlow * (0.11 + uLightMode * 0.04);
 
       float alpha = inside;
       alpha = max(alpha, outerGlow * 0.16);
@@ -372,11 +380,11 @@ export function GarimReferenceOrb({
           background:
             radial-gradient(
               ellipse at 50% 0%,
-              rgba(239, 246, 255, 0.64) 0%,
-              rgba(147, 197, 253, 0.42) 18%,
-              rgba(59, 130, 246, 0.28) 42%,
-              rgba(37, 99, 235, 0.12) 62%,
-              rgba(37, 99, 235, 0) 80%
+              rgba(233, 253, 255, 0.66) 0%,
+              rgba(54, 233, 255, 0.42) 18%,
+              rgba(22, 139, 255, 0.28) 42%,
+              rgba(7, 93, 246, 0.12) 62%,
+              rgba(7, 93, 246, 0) 80%
             );
           filter: blur(7px);
           opacity: 0.72;
@@ -412,10 +420,10 @@ export function GarimReferenceOrb({
           border-radius: 999px;
           background: radial-gradient(
             ellipse,
-            rgba(30, 58, 138, 0.42) 0%,
-            rgba(59, 130, 246, 0.22) 38%,
-            rgba(96, 165, 250, 0.08) 62%,
-            rgba(96, 165, 250, 0) 78%
+            rgba(6, 60, 200, 0.42) 0%,
+            rgba(7, 93, 246, 0.22) 38%,
+            rgba(54, 233, 255, 0.1) 62%,
+            rgba(54, 233, 255, 0) 78%
           );
           filter: blur(13px);
           z-index: 1;

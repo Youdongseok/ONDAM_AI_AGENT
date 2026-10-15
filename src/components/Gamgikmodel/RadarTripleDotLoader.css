@@ -1,7 +1,7 @@
 .status-infinity-loader {
-  --loader-color: #60a5fa;
-  --loader-color-right: #2563eb;
-  --loader-color-left: #7dd3fc;
+  --loader-color: #168bff;
+  --loader-color-right: #075df6;
+  --loader-color-left: #36e9ff;
   display: flex;
   justify-content: center;
   transform: scale(2);
