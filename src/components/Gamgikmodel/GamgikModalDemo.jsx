@@ -88,7 +88,7 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
           onClick={() => showExpression('happy')}
           className={expressionButtonClassName}
         >
-          ^^ 웃는 표정
+          웃는 표정
         </button>
 
         <button
@@ -96,7 +96,7 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
           onClick={() => showExpression('angry')}
           className={expressionButtonClassName}
         >
-          \ / 화난 표정
+          화난 표정
         </button>
 
         <button
@@ -104,7 +104,7 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
           onClick={() => showExpression('crying')}
           className={expressionButtonClassName}
         >
-          ㅠ ㅠ 우는 표정
+          우는 표정
         </button>
 
         <button type="button" onClick={showSleepyExpression} className={expressionButtonClassName}>
@@ -119,24 +119,24 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
           검색중
         </button>
 
-        <button
+        {/* <button
           type="button"
           aria-pressed={isLoading}
           onClick={() => setIsLoading(current => !current)}
           className={expressionButtonClassName}
         >
           {isLoading ? '로딩 종료' : '로딩'}
-        </button>
+        </button> */}
       </div>
 
-      <div className="w-full max-w-[520px]">
+      {/* <div className="w-full max-w-[520px]">
         <GlassPagination
           currentPage={currentPage}
           totalPages={12}
           onPageChange={setCurrentPage}
           themeMode={themeMode}
         />
-      </div>
+      </div> */}
     </section>
   );
 }
