@@ -82,7 +82,7 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
         />
       </div>
 
-      <div className="flex flex-wrap justify-center gap-3">
+      {/* <div className="flex flex-wrap justify-center gap-3">
         <button
           type="button"
           onClick={() => showExpression('happy')}
@@ -127,7 +127,7 @@ export default function GamgikModalDemo({ themeMode = 'light' }) {
         >
           {isLoading ? '로딩 종료' : '로딩'}
         </button>
-      </div>
+      </div> */}
 
       <div className="w-full max-w-[520px]">
         <GlassPagination
